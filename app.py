@@ -37,16 +37,16 @@ def index():
 @app.route('/shows')
 def shows():
     db = get_db()  
-    cursor = db.execute('select * from shows order by title desc')
-    shows = cursor.fetchall()
+    query = db.execute('select * from shows order by title desc')
+    shows = query.fetchall()
 
     return render_template('shows.html', shows=shows)
 
-@app.route('/shows/<public_id>')
-def show_details(public_id):
+@app.route('/shows/<show_id>')
+def show_details(show_id):
     db = get_db()
-    cursor = db.execute('select * from shows where public_id=?', [public_id])
-    show = cursor.fetchone()
+    query = db.execute('select * from shows where show_id=?', [show_id])
+    show = query.fetchone()
 
     return render_template('shows-details.html', show=show)
 
@@ -55,12 +55,12 @@ def show_add():
     if request.method == 'POST':
         db = get_db()
 
-        public_id = re.sub(r'\s', '-', request.form['title'])
-        public_id = re.sub(r'[^A-Za-z0-9\-]', '', public_id)
-        public_id = re.sub(r'--', '-', public_id)
+        show_id = re.sub(r'\s', '-', request.form['title'])
+        show_id = re.sub(r'[^A-Za-z0-9\-]', '', show_id)
+        show_id = re.sub(r'--', '-', show_id)
 
-        db.execute('insert into shows (public_id, title, seasons, description) values (?, ?, ?, ?)', [
-            public_id.lower(),
+        db.execute('insert into shows (show_id, title, seasons, description) values (?, ?, ?, ?)', [
+            show_id.lower(),
             request.form['title'],
             request.form['seasons'],
             request.form['description']
