@@ -80,5 +80,25 @@ def user_details(username):
 
     return render_template('user-details.html', username=username)
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        db = get_db()
+
+        db.execute('insert into users (username, email, password, first_name, last_name, permissions) values (?, ?, ?, ?, ?, ?)', [
+            request.form['email'],
+            request.form['username'],
+            request.form['password'],
+            request.form['first_name'],
+            request.form['last_name'],
+            0
+        ])
+
+        db.commit()
+
+        return redirect(url_for('index'))
+
+    return render_template('register.html')
+
 if __name__ == '__main__':
     app.run()
