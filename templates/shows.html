@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <h2>Shows</h2>
+
+    {% for show in shows %}
+        <div>
+            <h3>{{ show.title }}</h3>
+            <p>Seasons: {{ show.seasons }}</p>
+        </div>
+    {% endfor %}
+{% endblock %}
