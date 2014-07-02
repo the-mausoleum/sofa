@@ -1,4 +1,5 @@
 import os
+import re
 import sqlite3
 from flask import Flask, g, redirect, render_template, request, url_for
 import settings as SETTINGS
@@ -41,12 +42,25 @@ def shows():
 
     return render_template('shows.html', shows=shows)
 
+@app.route('/shows/<public_id>')
+def show_details(public_id):
+    db = get_db()
+    cursor = db.execute('select * from shows where public_id=?', [public_id])
+    show = cursor.fetchone()
+
+    return render_template('shows-details.html', show=show)
+
 @app.route('/shows/add', methods=['GET', 'POST'])
 def show_add():
     if request.method == 'POST':
         db = get_db()
 
-        db.execute('insert into shows (title, seasons) values (?, ?)', [
+        public_id = re.sub(r'\s', '-', request.form['title'])
+        public_id = re.sub(r'[^A-Za-z0-9\-]', '', public_id)
+        public_id = re.sub(r'--', '-', public_id)
+
+        db.execute('insert into shows (public_id, title, seasons) values (?, ?, ?)', [
+            public_id.lower(),
             request.form['title'],
             request.form['seasons']
         ])

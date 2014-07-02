@@ -1,6 +1,7 @@
 drop table if exists shows;
 create table shows (
     id integer primary key autoincrement,
+    public_id text not null,
     title text not null,
     seasons integer not null
 );
