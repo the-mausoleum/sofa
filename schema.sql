@@ -3,7 +3,8 @@ create table shows (
     id integer primary key autoincrement,
     public_id text not null,
     title text not null,
-    seasons integer not null
+    seasons integer not null,
+    description text
 );
 
 drop table if exists users;

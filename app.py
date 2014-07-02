@@ -59,10 +59,11 @@ def show_add():
         public_id = re.sub(r'[^A-Za-z0-9\-]', '', public_id)
         public_id = re.sub(r'--', '-', public_id)
 
-        db.execute('insert into shows (public_id, title, seasons) values (?, ?, ?)', [
+        db.execute('insert into shows (public_id, title, seasons, description) values (?, ?, ?, ?)', [
             public_id.lower(),
             request.form['title'],
-            request.form['seasons']
+            request.form['seasons'],
+            request.form['description']
         ])
 
         db.commit()
