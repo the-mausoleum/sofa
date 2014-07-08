@@ -39,13 +39,14 @@ def shows():
     db = get_db()  
     query = db.execute('select * from shows order by title desc')
     shows = query.fetchall()
+    print shows
 
     return render_template('shows.html', shows=shows)
 
 @app.route('/shows/<show_id>')
 def show_details(show_id):
     db = get_db()
-    query = db.execute('select * from shows where show_id=?', [show_id])
+    query = db.execute('select * from shows where public_id=?', [show_id])
     show = query.fetchone()
 
     return render_template('shows-details.html', show=show)
@@ -59,7 +60,7 @@ def show_add():
         show_id = re.sub(r'[^A-Za-z0-9\-]', '', show_id)
         show_id = re.sub(r'--', '-', show_id)
 
-        db.execute('insert into shows (show_id, title, seasons, description) values (?, ?, ?, ?)', [
+        db.execute('insert into shows (public_id, title, seasons, description) values (?, ?, ?, ?)', [
             show_id.lower(),
             request.form['title'],
             request.form['seasons'],

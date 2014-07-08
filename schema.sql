@@ -1,7 +1,7 @@
 drop table if exists shows;
 create table shows (
     id integer primary key autoincrement,
-    show_id text not null,
+    public_id text not null,
     title text not null,
     seasons integer not null,
     description text
@@ -10,14 +10,14 @@ create table shows (
 drop table if exists seasons;
 create table seasons (
     id integer primary key autoincrement,
-    season_id integer not null,
+    public_id integer not null,
     episodes integer not null
 );
 
 drop table if exists episodes;
 create table episodes (
     id integer primary key autoincrement,
-    episode_id integer not null,
+    public_id integer not null,
     title text not null
 );
 
