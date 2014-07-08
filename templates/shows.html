@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <h2>Shows</h2>
+
+    {% for show in shows %}
+        <div>
+            <h3><a href="{{ url_for('show_details', show_id=show.public_id) }}">{{ show.title }}</a></h3>
+            <p>Seasons: {{ show.seasons }}</p>
+        </div>
+    {% endfor %}
+{% endblock %}
