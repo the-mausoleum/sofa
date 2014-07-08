@@ -83,7 +83,10 @@ def user_details(username):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    pass
+    if request.method == 'POST':
+        return redirect(url_for('index'))
+
+    return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
