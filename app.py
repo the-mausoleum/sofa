@@ -39,7 +39,6 @@ def shows():
     db = get_db()  
     query = db.execute('select * from shows order by title desc')
     shows = query.fetchall()
-    print shows
 
     return render_template('shows.html', shows=shows)
 
@@ -77,9 +76,14 @@ def show_add():
 def user_details(username):
     db = get_db()
 
-    cur = db.execute('select from users where username=?', username)
+    query = db.execute('select * from users where username=?', [username])
+    user = query.fetchone()
 
-    return render_template('user-details.html', username=username)
+    return render_template('user-details.html', user=user)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    pass
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -87,9 +91,9 @@ def register():
         db = get_db()
 
         db.execute('insert into users (username, email, password, first_name, last_name, permissions) values (?, ?, ?, ?, ?, ?)', [
-            request.form['email'],
             request.form['username'],
             request.form['password'],
+            request.form['email'],
             request.form['first_name'],
             request.form['last_name'],
             0
