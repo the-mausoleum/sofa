@@ -3,9 +3,24 @@
 <head>
     <title>Sofa</title>
 
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
-{% block body %}{% endblock %}
+    <header class="navbar">
+        <div class="container">
+            <a class="logo" href="{{ url_for('index') }}">Sofa</a>
+
+            <ul class="nav">
+                <li><a href="{{ url_for('shows') }}">Shows</a></li>
+                <li><a href="{{ url_for('users') }}">Users</a></li>
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+            </ul>
+        </div>
+    </header>
+    <div class="container">
+        {% block body %}{% endblock %}
+    </div>
 </body>
 </html>

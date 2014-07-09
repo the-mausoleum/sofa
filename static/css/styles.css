@@ -2,3 +2,52 @@
     margin: 0;
     padding: 0;
 }
+
+body {
+    background: #fff;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+}
+
+h1, h2, h3 {
+    font-weight: 300;
+}
+
+.container {
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.navbar {
+    height: 50px;
+    background: #6f5499;
+}
+
+.logo {
+    padding: 5px;
+    color: #fff;
+    font-size: 30px;
+    font-weight: 300;
+    text-decoration: none;
+}
+
+ul.nav {
+    height: 50px;
+    display: inline-block;
+    list-style: none;
+}
+
+.nav li {
+    display: inline;
+    height: 50px;
+    padding: 5px;
+}
+
+.nav a,
+.nav a:visited {
+    font-weight: 300;
+    color: #fff;
+    text-decoration: none;
+}
