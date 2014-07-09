@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 
 app.config.update(dict(
-    DATABASE=os.path.join(app.root_path, 'sofa.db'),
+    DATABASE=os.path.join(app.root_path, 'db/sofa.db'),
     DEBUG=True,
     USERNAME=SETTINGS.DB_USERNAME,
     PASSWORD=SETTINGS.DB_PASSWORD
