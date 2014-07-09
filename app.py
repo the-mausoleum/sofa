@@ -72,6 +72,14 @@ def show_add():
 
     return render_template('shows-add.html')
 
+@app.route('shows/<show_id>/edit', methods=['GET', 'POST'])
+def show_edit(show_id):
+    pass
+
+@app.route('shows/<show_id>/delete')
+def show_delete(show_id):
+    pass
+
 @app.route('/users')
 def users():
     db = get_db()
