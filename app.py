@@ -36,7 +36,8 @@ def index():
 
 @app.route('/shows')
 def shows():
-    db = get_db()  
+    db = get_db()
+
     query = db.execute('select * from shows order by title desc')
     shows = query.fetchall()
 
@@ -45,6 +46,7 @@ def shows():
 @app.route('/shows/<show_id>')
 def show_details(show_id):
     db = get_db()
+
     query = db.execute('select * from shows where public_id=?', [show_id])
     show = query.fetchone()
 
@@ -69,6 +71,15 @@ def show_add():
         return redirect(url_for('shows'))
 
     return render_template('shows-add.html')
+
+@app.route('/users')
+def users():
+    db = get_db()
+
+    query = db.execute('select * from users order by username desc')
+    users = query.fetchall()
+
+    return render_template('users.html', users=users)
 
 @app.route('/users/<username>')
 def user_details(username):
