@@ -1,7 +1,7 @@
 import os
 import re
 import sqlite3
-from flask import Flask, g, redirect, render_template, request, url_for
+from flask import Flask, g, redirect, render_template, request, session, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import settings as SETTINGS
@@ -14,7 +14,8 @@ app.config.update(dict(
     SQLALCHEMY_DATABASE_URI='sqlite:///db/sofa.db',
     DEBUG=True,
     USERNAME=SETTINGS.DB_USERNAME,
-    PASSWORD=SETTINGS.DB_PASSWORD
+    PASSWORD=SETTINGS.DB_PASSWORD,
+    SECRET_KEY=SETTINGS.SECRET_KEY
 ))
 
 db = SQLAlchemy(app)
@@ -71,17 +72,31 @@ def user_details(username):
 
     return render_template('user-details.html', user=user)
 
+@app.route('/users/<username>/settings')
+def user_settings(username):
+    if session.get('username') != username:
+        return redirect(url_for('user_details', username=username))
+
+    return render_template('user-settings.html')
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         user = User.query.filter_by(username=request.form['username']).first()
 
         if check_password_hash(user.password, request.form['password']):
+            session['username'] = user.username
             return redirect(url_for('index'))
         else:
-            return 'No dice'
+            return redirect(url_for('login'))
 
     return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+
+    return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
