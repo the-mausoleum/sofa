@@ -5,6 +5,7 @@ from flask import Flask, g, redirect, render_template, request, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import settings as SETTINGS
+from models import *
 
 app = Flask(__name__)
 app.config.from_object(__name__)
