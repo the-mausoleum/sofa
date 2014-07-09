@@ -5,7 +5,7 @@
     {% for show in shows %}
         <div>
             <h3><a href="{{ url_for('show_details', show_id=show.public_id) }}">{{ show.title }}</a></h3>
-            <p>Seasons: {{ show.seasons }}</p>
+            <p>Seasons: {{ show.season_count }}</p>
         </div>
     {% endfor %}
 {% endblock %}

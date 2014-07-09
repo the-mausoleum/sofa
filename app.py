@@ -55,11 +55,9 @@ def show_add():
     if request.method == 'POST':
         db = get_db()
 
-        show_id = re.sub(r'\s', '-', request.form['title'])
-        show_id = re.sub(r'[^A-Za-z0-9\-]', '', show_id)
-        show_id = re.sub(r'--', '-', show_id)
+        show_id = get_public_id(request.form['title'])
 
-        db.execute('insert into shows (public_id, title, seasons, description) values (?, ?, ?, ?)', [
+        db.execute('insert into shows (public_id, title, season_count, description) values (?, ?, ?, ?)', [
             show_id.lower(),
             request.form['title'],
             request.form['seasons'],
@@ -107,6 +105,13 @@ def register():
         return redirect(url_for('index'))
 
     return render_template('register.html')
+
+def get_public_id(title):
+    public_id = re.sub(r'\s', '-', title)
+    public_id = re.sub(r'[^A-Za-z0-9\-]', '', public_id)
+    public_id = re.sub(r'--', '-', public_id)
+
+    return public_id
 
 if __name__ == '__main__':
     app.run()
