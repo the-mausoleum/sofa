@@ -2,6 +2,7 @@ import os
 import re
 import sqlite3
 from flask import Flask, g, redirect, render_template, request, url_for
+from werkzeug.security import generate_password_hash, check_password_hash
 import settings as SETTINGS
 
 app = Flask(__name__)
@@ -101,7 +102,15 @@ def user_details(username):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        return redirect(url_for('index'))
+        db = get_db()
+
+        query = db.execute('select * from users where username=?', [request.form['username']])
+        user = query.fetchone()
+
+        if check_password_hash(user['password'], request.form['password']):
+            return redirect(url_for('index'))
+        else:
+            return 'No dice'
 
     return render_template('login.html')
 
@@ -110,10 +119,10 @@ def register():
     if request.method == 'POST':
         db = get_db()
 
-        db.execute('insert into users (username, email, password, first_name, last_name, permissions) values (?, ?, ?, ?, ?, ?)', [
-            request.form['username'],
-            request.form['password'],
+        db.execute('insert into users (email, username, password, first_name, last_name, permissions) values (?, ?, ?, ?, ?, ?)', [
             request.form['email'],
+            request.form['username'],
+            generate_password_hash(request.form['password']),
             request.form['first_name'],
             request.form['last_name'],
             0
