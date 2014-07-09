@@ -18,6 +18,4 @@ DB_PASSWORD='default'
 ```
 
 ###Database
-In the `db` directory:
-
-`sqlite3 sofa.db < schema.sql`
+`python -m db.init`

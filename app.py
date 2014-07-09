@@ -51,8 +51,6 @@ class User(db.Model):
         self.last_name = last_name
         self.permissions = 0
 
-db.create_all()
-
 @app.route('/')
 def index():
     return render_template('index.html')
