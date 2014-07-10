@@ -1,5 +1,4 @@
 import os
-import re
 import sqlite3
 from flask import Flask, g, redirect, render_template, request, session, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -33,8 +32,9 @@ def shows():
 @app.route('/shows/<show_id>')
 def show_details(show_id):
     show = Show.query.filter_by(public_id=show_id).first()
+    episodes = Episode.query.filter_by(show_id=show.id)
 
-    return render_template('shows-details.html', show=show)
+    return render_template('show-details.html', show=show, episodes=episodes)
 
 @app.route('/shows/add', methods=['GET', 'POST'])
 def show_add():
@@ -50,7 +50,7 @@ def show_add():
 
         return redirect(url_for('shows'))
 
-    return render_template('shows-add.html')
+    return render_template('show-add.html')
 
 @app.route('/shows/<show_id>/edit', methods=['GET', 'POST'])
 def show_edit(show_id):
@@ -59,6 +59,28 @@ def show_edit(show_id):
 @app.route('/shows/<show_id>/delete')
 def show_delete(show_id):
     pass
+
+@app.route('/shows/<show_id>/episodes')
+def episodes(show_id):
+    pass
+
+@app.route('/shows/<show_id>/episodes/add', methods=['GET', 'POST'])
+def episode_add(show_id):
+    show = Show.query.filter_by(public_id=show_id).first()
+
+    if request.method == 'POST':
+        episode = Episode(
+            request.form['title'],
+            request.form['description'],
+            show.id
+        )
+
+        db.session.add(episode)
+        db.session.commit()
+
+        return redirect(url_for('show_details', show_id=show_id))
+
+    return render_template('episode-add.html')
 
 @app.route('/users')
 def users():
@@ -115,13 +137,6 @@ def register():
         return redirect(url_for('index'))
 
     return render_template('register.html')
-
-def get_public_id(title):
-    public_id = re.sub(r'\s', '-', title)
-    public_id = re.sub(r'[^A-Za-z0-9\-]', '', public_id)
-    public_id = re.sub(r'--', '-', public_id)
-
-    return public_id.lower()
 
 if __name__ == '__main__':
     app.run()

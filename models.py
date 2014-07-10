@@ -1,3 +1,4 @@
+import re
 from werkzeug.security import generate_password_hash
 from app import db
 
@@ -7,6 +8,7 @@ class Show(db.Model):
     title = db.Column(db.String(255), unique=True)
     season_count = db.Column(db.Integer)
     description = db.Column(db.Text)
+    episodes = db.relationship('Episode', backref='show', lazy='dynamic')
 
     def __init__(self, title, season_count, description):
         self.public_id = get_public_id(title)
@@ -16,6 +18,22 @@ class Show(db.Model):
 
     def __repr__(self):
         return '<Show %r>' % self.title
+
+class Episode(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    public_id = db.Column(db.String(255))
+    title = db.Column(db.String(255))
+    description = db.Column(db.Text)
+    show_id = db.Column(db.Integer, db.ForeignKey('show.id'))
+
+    def __init__(self, title, description, show_id):
+        self.public_id = get_public_id(title)
+        self.title = title
+        self.description = description
+        self.show_id = show_id
+
+    def __repr__(self):
+        return '<Episode %r>' % self.title
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -36,3 +54,10 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.username
+
+def get_public_id(title):
+    public_id = re.sub(r'\s', '-', title)
+    public_id = re.sub(r'[^A-Za-z0-9\-]', '', public_id)
+    public_id = re.sub(r'--', '-', public_id)
+
+    return public_id.lower()
