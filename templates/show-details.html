@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <h2>{{ show.title }}</h2>
+    <p>{{ show.description }}</p>
+
+    <h3>Episodes</h3>
+    {% for episode in episodes %}
+        <div>
+            <h4>{{ episode.title }}</h4>
+            <p>{{ episode.description }}</p>
+        </div>
+    {% endfor %}
+{% endblock %}
