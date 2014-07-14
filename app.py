@@ -2,7 +2,7 @@ import os
 import re
 import sqlite3
 from collections import defaultdict
-from flask import Flask, g, redirect, render_template, request, session, url_for
+from flask import abort, Flask, g, redirect, render_template, request, session, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import settings as SETTINGS
@@ -101,6 +101,10 @@ def get_public_id(title):
 def index():
     return render_template('index.html')
 
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('404.html'), 404
+
 @app.route('/shows')
 def shows():
     shows = Show.query.all()
@@ -112,12 +116,13 @@ def show_details(show_id):
     user = User.query.filter_by(username=session.get('username')).first()
     show = Show.query.filter_by(public_id=show_id).first()
     episodes = Episode.query.filter_by(show_id=show.id).all()
-    seasons = defaultdict(list)
 
     if user:
         favorited = any(show_id in show.public_id for show in user.get_favorites())
     else:
         favorited = False
+
+    seasons = defaultdict(list)
 
     for episode in episodes:
         seasons[episode.season].append(episode)
