@@ -126,9 +126,11 @@ def show_favorite(show_id):
     user = User.query.filter_by(username=session.get('username')).first()
     show = Show.query.filter_by(public_id=show_id).first()
 
-    user.add_favorite(show)
+    favorited = any(show_id in show.public_id for show in user.get_favorites())
 
-    db.session.commit()
+    if not favorited:
+        user.add_favorite(show)
+        db.session.commit()
 
     return redirect(url_for('show_details', show_id=show_id))
 
@@ -137,9 +139,11 @@ def show_unfavorite(show_id):
     user = User.query.filter_by(username=session.get('username')).first()
     show = Show.query.filter_by(public_id=show_id).first()
 
-    user.remove_favorite(show)
+    favorited = any(show_id in show.public_id for show in user.get_favorites())
 
-    db.session.commit()
+    if favorited:
+        user.remove_favorite(show)
+        db.session.commit()
 
     return redirect(url_for('show_details', show_id=show_id))
 
