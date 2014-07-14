@@ -45,9 +45,10 @@ class Episode(db.Model):
     description = db.Column(db.Text)
     show_id = db.Column(db.Integer, db.ForeignKey('show.id'))
 
-    def __init__(self, title, description, show_id):
+    def __init__(self, title, season, description, show_id):
         self.public_id = get_public_id(title)
         self.title = title
+        self.season = season
         self.description = description
         self.show_id = show_id
 
@@ -142,6 +143,7 @@ def episode_add(show_id):
     if request.method == 'POST':
         episode = Episode(
             request.form['title'],
+            request.form['season'],
             request.form['description'],
             show.id
         )
