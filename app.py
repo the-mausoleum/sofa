@@ -45,9 +45,10 @@ class Episode(db.Model):
     description = db.Column(db.Text)
     show_id = db.Column(db.Integer, db.ForeignKey('show.id'))
 
-    def __init__(self, title, description, show_id):
+    def __init__(self, title, season, description, show_id):
         self.public_id = get_public_id(title)
         self.title = title
+        self.season = season
         self.description = description
         self.show_id = show_id
 
@@ -62,6 +63,7 @@ class User(db.Model):
     first_name = db.Column(db.String(255))
     last_name = db.Column(db.String(255))
     permissions = db.Column(db.Integer)
+    favorites = db.relationship('Show', backref='show', secondary='favorites', lazy='dynamic')
 
     def __init__(self, email, username, password, first_name, last_name):
         self.email = email
@@ -71,8 +73,22 @@ class User(db.Model):
         self.last_name = last_name
         self.permissions = 0
 
+    def get_favorites(self):
+        return [show for show in self.favorites]
+
+    def add_favorite(self, show):
+        self.favorites.append(show)
+
+    def remove_favorite(self, show):
+        self.favorites.remove(show)
+
     def __repr__(self):
         return '<User %r>' % self.username
+
+favorites = db.Table('favorites',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('show_id', db.Integer, db.ForeignKey('show.id'))
+)
 
 def get_public_id(title):
     public_id = re.sub(r'\s', '-', title)
@@ -93,14 +109,39 @@ def shows():
 
 @app.route('/shows/<show_id>')
 def show_details(show_id):
+    user = User.query.filter_by(username=session.get('username')).first()
     show = Show.query.filter_by(public_id=show_id).first()
     episodes = Episode.query.filter_by(show_id=show.id).all()
     seasons = defaultdict(list)
 
+    favorited = any(show_id in show.public_id for show in user.get_favorites())
+
     for episode in episodes:
         seasons[episode.season].append(episode)
 
-    return render_template('show-details.html', show=show, seasons=seasons)
+    return render_template('show-details.html', show=show, seasons=seasons, favorited=favorited)
+
+@app.route('/shows/<show_id>/favorite')
+def show_favorite(show_id):
+    user = User.query.filter_by(username=session.get('username')).first()
+    show = Show.query.filter_by(public_id=show_id).first()
+
+    user.add_favorite(show)
+
+    db.session.commit()
+
+    return redirect(url_for('show_details', show_id=show_id))
+
+@app.route('/shows/<show_id>/unfavorite')
+def show_unfavorite(show_id):
+    user = User.query.filter_by(username=session.get('username')).first()
+    show = Show.query.filter_by(public_id=show_id).first()
+
+    user.remove_favorite(show)
+
+    db.session.commit()
+
+    return redirect(url_for('show_details', show_id=show_id))
 
 @app.route('/shows/add', methods=['GET', 'POST'])
 def show_add():
@@ -142,6 +183,7 @@ def episode_add(show_id):
     if request.method == 'POST':
         episode = Episode(
             request.form['title'],
+            request.form['season'],
             request.form['description'],
             show.id
         )
