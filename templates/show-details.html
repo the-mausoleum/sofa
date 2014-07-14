@@ -2,6 +2,11 @@
 {% block body %}
     <div class="show">
         <h1>{{ show.title }}</h1>
+        {% if favorited %}
+            <a href="{{url_for('show_unfavorite', show_id=show.public_id)}}"><span class="fa fa-heart favorite"></span></a>
+        {% else %}
+            <a href="{{url_for('show_favorite', show_id=show.public_id)}}"><span class="fa fa-heart-o favorite"></span></a>
+        {% endif %}
         <p>{{ show.description }}</p>
 
         {% for season in range(show.season_count) %}

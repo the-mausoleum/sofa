@@ -56,6 +56,12 @@ ul.nav {
     font-size: 45px;
 }
 
+.favorite,
+.favorite:visited {
+    color: #c7254e;
+    text-decoration: none;
+}
+
 .season h2 {
     font-size: 30px;
 }
