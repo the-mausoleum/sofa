@@ -1,0 +1,19 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <h2>{{ show.title }}</h2>
+    <p>{{ show.description }}</p>
+
+    {% for season in range(show.season_count) %}
+        <div>
+            <h3>Season {{ season + 1 }}</h3>
+            <div>
+                {% for episode in seasons[season + 1] %}
+                    <div>
+                        <h4>{{ episode.title }}</h4>
+                        <p>{{ episode.description }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
