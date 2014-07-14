@@ -114,7 +114,10 @@ def show_details(show_id):
     episodes = Episode.query.filter_by(show_id=show.id).all()
     seasons = defaultdict(list)
 
-    favorited = any(show_id in show.public_id for show in user.get_favorites())
+    if user:
+        favorited = any(show_id in show.public_id for show in user.get_favorites())
+    else:
+        favorited = False
 
     for episode in episodes:
         seasons[episode.season].append(episode)
@@ -123,27 +126,29 @@ def show_details(show_id):
 
 @app.route('/shows/<show_id>/favorite')
 def show_favorite(show_id):
-    user = User.query.filter_by(username=session.get('username')).first()
-    show = Show.query.filter_by(public_id=show_id).first()
+    if session.get('username'):
+        user = User.query.filter_by(username=session.get('username')).first()
+        show = Show.query.filter_by(public_id=show_id).first()
 
-    favorited = any(show_id in show.public_id for show in user.get_favorites())
+        favorited = any(show_id in show.public_id for show in user.get_favorites())
 
-    if not favorited:
-        user.add_favorite(show)
-        db.session.commit()
+        if not favorited:
+            user.add_favorite(show)
+            db.session.commit()
 
     return redirect(url_for('show_details', show_id=show_id))
 
 @app.route('/shows/<show_id>/unfavorite')
 def show_unfavorite(show_id):
-    user = User.query.filter_by(username=session.get('username')).first()
-    show = Show.query.filter_by(public_id=show_id).first()
+    if session.get('username'):
+        user = User.query.filter_by(username=session.get('username')).first()
+        show = Show.query.filter_by(public_id=show_id).first()
 
-    favorited = any(show_id in show.public_id for show in user.get_favorites())
+        favorited = any(show_id in show.public_id for show in user.get_favorites())
 
-    if favorited:
-        user.remove_favorite(show)
-        db.session.commit()
+        if favorited:
+            user.remove_favorite(show)
+            db.session.commit()
 
     return redirect(url_for('show_details', show_id=show_id))
 
