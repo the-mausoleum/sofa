@@ -1,6 +1,7 @@
 import os
 import re
 import sqlite3
+from collections import defaultdict
 from flask import Flask, g, redirect, render_template, request, session, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -40,6 +41,7 @@ class Episode(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String(255))
     title = db.Column(db.String(255))
+    season = db.Column(db.Integer)
     description = db.Column(db.Text)
     show_id = db.Column(db.Integer, db.ForeignKey('show.id'))
 
@@ -93,8 +95,12 @@ def shows():
 def show_details(show_id):
     show = Show.query.filter_by(public_id=show_id).first()
     episodes = Episode.query.filter_by(show_id=show.id).all()
+    seasons = defaultdict(list)
 
-    return render_template('show-details.html', show=show, episodes=episodes)
+    for episode in episodes:
+        seasons[episode.season].append(episode)
+
+    return render_template('show-details.html', show=show, seasons=seasons)
 
 @app.route('/shows/add', methods=['GET', 'POST'])
 def show_add():
@@ -146,6 +152,14 @@ def episode_add(show_id):
         return redirect(url_for('show_details', show_id=show_id))
 
     return render_template('episode-add.html')
+
+@app.route('/shows/<show_id>/episodes/<episode_id>/edit')
+def episode_edit(show_id, episode_id):
+    pass
+
+@app.route('/shows/<show_id>/episodes/<episode_id>/delete')
+def episode_delete(show_id, episode_id):
+    pass
 
 @app.route('/users')
 def users():
