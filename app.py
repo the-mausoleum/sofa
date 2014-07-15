@@ -175,6 +175,18 @@ def show_start(show_id):
 
     return redirect(url_for('show_details', show_id=show_id))
 
+@app.route('/shows/<show_id>/pause')
+def show_pause(show_id):
+    pass
+
+@app.route('/shows/<show_id>/resume')
+def show_resume(show_id):
+    pass
+
+@app.route('/shows/<show_id>/stop')
+def show_stop(show_id):
+    pass
+
 @app.route('/shows/<show_id>/favorite')
 def show_favorite(show_id):
     if session.get('username'):
