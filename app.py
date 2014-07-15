@@ -57,6 +57,18 @@ class Episode(db.Model):
     def __repr__(self):
         return '<Episode %r>' % self.title
 
+class Progress(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    show_id = db.Column(db.Integer, db.ForeignKey('show.id'))
+    episode_id = db.Column(db.Integer, db.ForeignKey('episode.id'))
+
+    def __init__(self, show_id, episode_id):
+        self.show_id = show_id
+        self.episode_id = episode_id
+
+    def __repr__(self):
+        return '<Progress %r>' % self.id
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True)
@@ -65,6 +77,7 @@ class User(db.Model):
     first_name = db.Column(db.String(255))
     last_name = db.Column(db.String(255))
     permissions = db.Column(db.Integer)
+    watching = db.relationship('Progress', backref='progress', secondary='watching', lazy='dynamic')
     favorites = db.relationship('Show', backref='show', secondary='favorites', lazy='dynamic')
 
     def __init__(self, email, username, password, first_name, last_name):
@@ -74,6 +87,12 @@ class User(db.Model):
         self.first_name = first_name
         self.last_name = last_name
         self.permissions = 0
+
+    def get_watching(self):
+        return [progress for progress in self.watching]
+
+    def add_watching(self, progress):
+        self.watching.append(progress)
 
     def get_favorites(self):
         return [show for show in self.favorites]
@@ -86,6 +105,11 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.username
+
+watching = db.Table('watching',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('progress_id', db.Integer, db.ForeignKey('progress.id'))
+)
 
 favorites = db.Table('favorites',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
@@ -120,8 +144,10 @@ def show_details(show_id):
     episodes = Episode.query.filter_by(show_id=show.id).all()
 
     if user:
-        favorited = any(show_id in show.public_id for show in user.get_favorites())
+        watching = any(show.id == progress.id for progress in user.get_watching())
+        favorited = any(show_id == show.public_id for show in user.get_favorites())
     else:
+        watching = False
         favorited = False
 
     seasons = defaultdict(list)
@@ -129,7 +155,25 @@ def show_details(show_id):
     for episode in episodes:
         seasons[episode.season].append(episode)
 
-    return render_template('show-details.html', show=show, seasons=seasons, favorited=favorited)
+    return render_template('show-details.html', show=show, seasons=seasons, watching=watching, favorited=favorited)
+
+@app.route('/shows/<show_id>/start')
+def show_start(show_id):
+    if session.get('username'):
+        user = User.query.filter_by(username=session.get('username')).first()
+        show = Show.query.filter_by(public_id=show_id).first()
+        episode = Episode.query.filter_by(season=1).filter_by(season_number=1).first()
+
+        progress = Progress(
+            show.id,
+            episode.id
+        )
+
+        db.session.add(progress)
+        user.add_watching(progress)
+        db.session.commit()
+
+    return redirect(url_for('show_details', show_id=show_id))
 
 @app.route('/shows/<show_id>/favorite')
 def show_favorite(show_id):
@@ -137,7 +181,7 @@ def show_favorite(show_id):
         user = User.query.filter_by(username=session.get('username')).first()
         show = Show.query.filter_by(public_id=show_id).first()
 
-        favorited = any(show_id in show.public_id for show in user.get_favorites())
+        favorited = any(show_id == show.public_id for show in user.get_favorites())
 
         if not favorited:
             user.add_favorite(show)
@@ -151,7 +195,7 @@ def show_unfavorite(show_id):
         user = User.query.filter_by(username=session.get('username')).first()
         show = Show.query.filter_by(public_id=show_id).first()
 
-        favorited = any(show_id in show.public_id for show in user.get_favorites())
+        favorited = any(show_id == show.public_id for show in user.get_favorites())
 
         if favorited:
             user.remove_favorite(show)

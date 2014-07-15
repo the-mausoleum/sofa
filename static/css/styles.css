@@ -56,6 +56,14 @@ ul.nav {
     font-size: 45px;
 }
 
+.watching {
+    color: #1fa67a;
+}
+
+.watching.start {
+    color: #eee;
+}
+
 .favorite,
 .favorite:visited {
     color: #c7254e;
