@@ -3,4 +3,23 @@
     <h1>{{ user.username }}</h1>
 
     <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+
+    <div>
+        <h3>Watching</h3>
+        {% for progress in user.watching %}
+            <div>
+                <h4>{{ progress.show.title }}</h4>
+                <span>Season {{ progress.episode.season }} Episode {{ progress.episode.number }}</span>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div>
+        <h3>Favorites</h3>
+        {% for show in user.favorites %}
+            <div>
+                <h4>{{ show.title }}</h4>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}

@@ -66,6 +66,14 @@ class Progress(db.Model):
         self.show_id = show_id
         self.episode_id = episode_id
 
+    @property
+    def show(self):
+        return Show.query.filter_by(id=self.show_id).first()
+
+    @property
+    def episode(self):
+        return Episode.query.filter_by(id=self.episode_id).first()
+
     def __repr__(self):
         return '<Progress %r>' % self.id
 
