@@ -13,6 +13,10 @@
         <div class="container">
             <a class="logo" href="{{ url_for('index') }}">Sofa</a>
 
+            <form class="search-bar" method="post" action="{{ url_for('search') }}">
+                <input type="search" name="search">
+            </form>
+
             <ul class="nav">
                 <li><a href="{{ url_for('shows') }}">Shows</a></li>
                 <li><a href="{{ url_for('users') }}">Users</a></li>

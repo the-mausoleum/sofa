@@ -149,6 +149,24 @@ def index():
 def page_not_found(error):
     return render_template('404.html'), 404
 
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    if request.method == 'GET':
+        return redirect(url_for('index'))
+
+    search = request.form['search']
+    q =  '%' + search + '%'
+
+    results = dict(
+        shows=Show.query.filter(Show.title.like(q)).all(),
+        episodes=Episode.query.filter(Episode.title.like(q)).all(),
+        users=User.query.filter(User.username.like(q)).all()
+    )
+
+    print results #dev
+
+    return render_template('search-results.html', search=search, results=results)
+
 @app.route('/shows')
 def shows():
     shows = Show.query.all()

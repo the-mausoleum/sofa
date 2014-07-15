@@ -33,6 +33,11 @@ h1, h2, h3, h4, h5, h6 {
     text-decoration: none;
 }
 
+.nav {
+    margin-top: 15px;
+    float: right;
+}
+
 ul.nav {
     height: 50px;
     display: inline-block;
@@ -50,6 +55,17 @@ ul.nav {
     font-weight: 300;
     color: #fff;
     text-decoration: none;
+}
+
+.search-bar {
+    position: relative;
+    top: -4px;
+    display: inline;
+    padding: 10px;
+}
+
+.search-bar input[type=search] {
+    width: 150px;
 }
 
 .show h1 {

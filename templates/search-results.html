@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <h1>Search</h1>
+
+    <h2>"{{ search }}"</h2>
+
+    <h3>Shows</h3>
+    {% for show in results.shows %}
+        {{ show.title }}
+    {% endfor %}
+
+    <h3>Episodes</h3>
+    {% for episode in results.episodes %}
+        {{ episode.title }}
+    {% endfor %}
+
+    <h3>Users</h3>
+    {% for user in results.users %}
+        {{ user.username }}
+    {% endfor %}
+{% endblock %}
