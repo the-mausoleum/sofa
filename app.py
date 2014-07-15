@@ -2,6 +2,7 @@ import os
 import re
 import sqlite3
 from collections import defaultdict
+from enum import Enum
 from flask import abort, Flask, g, redirect, render_template, request, session, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -17,6 +18,13 @@ app.config.update(dict(
     PASSWORD=SETTINGS.DB_PASSWORD,
     SECRET_KEY=SETTINGS.SECRET_KEY
 ))
+
+class Status(Enum):
+    NONE = 0
+    WAITING = 1
+    WATCHING = 2
+    PAUSED = 4
+    STOPPED = 8
 
 db = SQLAlchemy(app)
 
@@ -61,10 +69,12 @@ class Progress(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     show_id = db.Column(db.Integer, db.ForeignKey('show.id'))
     episode_id = db.Column(db.Integer, db.ForeignKey('episode.id'))
+    status = db.Column(db.Integer)
 
-    def __init__(self, show_id, episode_id):
+    def __init__(self, show_id, episode_id, status):
         self.show_id = show_id
         self.episode_id = episode_id
+        self.status = status
 
     @property
     def show(self):
@@ -172,20 +182,35 @@ def show_start(show_id):
         show = Show.query.filter_by(public_id=show_id).first()
         episode = Episode.query.filter_by(season=1).filter_by(number=1).first()
 
-        progress = Progress(
-            show.id,
-            episode.id
-        )
+        watching = any(show.id == progress.show_id for progress in user.get_watching())
 
-        db.session.add(progress)
-        user.add_watching(progress)
-        db.session.commit()
+        if not watching:
+            progress = Progress(
+                show.id,
+                episode.id,
+                Status.WATCHING.value
+            )
+
+            db.session.add(progress)
+            user.add_watching(progress)
+            db.session.commit()
 
     return redirect(url_for('show_details', show_id=show_id))
 
 @app.route('/shows/<show_id>/pause')
 def show_pause(show_id):
-    pass
+    if session.get('username'):
+        user = User.query.filter_by(username=session.get('username')).first()
+        show = Show.query.filter_by(public_id=show_id).first()
+
+        watching = any(show.id == progress.show_id for progress in user.get_watching())
+
+        if watching:
+            progress = Progress.query.filter_by(show_id=show.id).first()
+            progress.status = Status.PAUSED.value
+            db.session.commit()
+
+    return redirect(url_for('show_details', show_id=show_id))
 
 @app.route('/shows/<show_id>/resume')
 def show_resume(show_id):

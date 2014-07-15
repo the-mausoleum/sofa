@@ -2,15 +2,16 @@
 {% block body %}
     <div class="show">
         <h1>{{ show.title }}</h1>
-        {% if watching %}
-            <span class="fa fa-play-circle watching"></span>
-        {% else %}
-            <a href="{{url_for('show_start', show_id=show.public_id)}}"><span class="fa fa-play-circle watching start"></span></a>
-        {% endif %}
         {% if favorited %}
             <a href="{{url_for('show_unfavorite', show_id=show.public_id)}}"><span class="fa fa-heart favorite"></span></a>
         {% else %}
             <a href="{{url_for('show_favorite', show_id=show.public_id)}}"><span class="fa fa-heart-o favorite"></span></a>
+        {% endif %}
+        
+        {% if watching %}
+            <span class="fa fa-play-circle watching">&nbsp;Watching</span>
+        {% else %}
+            <a href="{{url_for('show_start', show_id=show.public_id)}}"><span class="fa fa-play-circle watching start"></span></a>
         {% endif %}
         <p>{{ show.description }}</p>
 
