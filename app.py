@@ -42,15 +42,15 @@ class Episode(db.Model):
     public_id = db.Column(db.String(255))
     title = db.Column(db.String(255))
     season = db.Column(db.Integer)
-    season_number = db.Column(db.Integer)
+    number = db.Column(db.Integer)
     description = db.Column(db.Text)
     show_id = db.Column(db.Integer, db.ForeignKey('show.id'))
 
-    def __init__(self, title, season, season_number, description, show_id):
+    def __init__(self, title, season, number, description, show_id):
         self.public_id = get_public_id(title)
         self.title = title
         self.season = season
-        self.season_number = season_number
+        self.number = number
         self.description = description
         self.show_id = show_id
 
@@ -162,7 +162,7 @@ def show_start(show_id):
     if session.get('username'):
         user = User.query.filter_by(username=session.get('username')).first()
         show = Show.query.filter_by(public_id=show_id).first()
-        episode = Episode.query.filter_by(season=1).filter_by(season_number=1).first()
+        episode = Episode.query.filter_by(season=1).filter_by(number=1).first()
 
         progress = Progress(
             show.id,
@@ -256,7 +256,7 @@ def episode_add(show_id):
         episode = Episode(
             request.form['title'],
             request.form['season'],
-            request.form['season-number'],
+            request.form['number'],
             request.form['description'],
             show.id
         )
