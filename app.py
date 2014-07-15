@@ -244,8 +244,8 @@ def show_delete(show_id):
 
     return redirect(url_for('shows'))
 
-@app.route('/shows/<show_id>/episodes')
-def episodes(show_id):
+@app.route('/shows/<show_id>/episodes/<episode_id>')
+def episode_details(show_id, episode_id):
     pass
 
 @app.route('/shows/<show_id>/episodes/add', methods=['GET', 'POST'])
